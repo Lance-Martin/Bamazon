@@ -56,8 +56,42 @@ function addMore() {
     }, {
           id: id
       }], function(err, res) {});
-  });
     });
+  });
+}
+
+function addItem() {
+  inquirer.prompt([
+    {
+      type: 'input',
+      message: "name of item to add?: ",
+      name: 'name',
+    },
+    {
+      type: 'input',
+      message: 'department of the item to add?: ',
+      name: 'department'
+    },
+    {
+      type: 'input',
+      message: 'price of the item to add?: ',
+      name: 'price'
+    },
+    {
+      type: 'input',
+      message: 'how many of this item is being added?: ',
+      name: 'amount',
+    }
+  ]).then(function(user){
+    connection.query("INSERT INTO products SET ?", {
+    productName: user.name,
+    departmentName: user.department,
+    price: user.price,
+    stockQuantity: user.amount,
+    }, function(err, res) {
+    
+    });
+  });
 }
 
 inquirer.prompt([{
@@ -76,6 +110,6 @@ inquirer.prompt([{
     addMore();
   }
   else if (user.option == "add new product"){
-
+    addItem();
   }
 });
