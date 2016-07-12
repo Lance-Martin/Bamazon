@@ -13,8 +13,9 @@ function viewProducts() {
   connection.query('SELECT * FROM products',
      function(err, res) {
        if(err) throw err;
+       console.log('\n');
        for (var i = 0; i < res.length; i++) {
-          console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + "|" + res[i].stockQuantity);
+          console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
       }
      });
 }
@@ -23,8 +24,9 @@ function viewLow() {
   connection.query('SELECT * FROM products WHERE stockQuantity < 6',
      function(err, res) {
        if(err) throw err;
+       console.log("\n");
        for (var i = 0; i < res.length; i++) {
-          console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + "|" + res[i].stockQuantity);
+          console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
       }
      });
 }
@@ -44,20 +46,36 @@ function addMore() {
   ]).then(function(user){
     var id = user.idSelected;
     var currentQuantity;
+    var theNum;
     console.log('id to be added to: '+ id);
     console.log("number to add:"+user.numAdded);
     connection.query('SELECT stockQuantity FROM products WHERE id = ' + user.idSelected, function(err, res) {
     if (err) throw err;
     currentQuantity = res[0].stockQuantity;
     console.log("current q:"+ currentQuantity);
-  }).then(function(){
+    //theNum = (currentQuantity + user.numAdded).replace( /^\D+/g, '');
+    theNum = parseInt(currentQuantity)+ parseInt(user.numAdded);
+    console.log('the number after being added to: ' + theNum);
     connection.query("UPDATE products SET ? WHERE ?", [{
-      stockQuantity: (currentQuantity + user.numAdded)
-    }, {
+      stockQuantity: theNum,
+    },{
           id: id
-      }], function(err, res) {});
+      }
+    ], function(err, res) {
+        if(err) throw err;
+        console.log("quantity added");
+      });
     });
-  });
+    // connection.query("UPDATE products SET ? WHERE ?", [{
+    //   stockQuantity: theNum,
+    // },{
+    //       id: id
+    //   }
+    // ], function(err, res) {
+    //     if(err) throw err;
+    //     console.log("quantity added");
+    //   });
+    });
 }
 
 function addItem() {
@@ -89,7 +107,7 @@ function addItem() {
     price: user.price,
     stockQuantity: user.amount,
     }, function(err, res) {
-    
+
     });
   });
 }

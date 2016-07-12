@@ -12,14 +12,18 @@ var connection = mysql.createConnection({
 var id;
 var quantity;
 
-connection.query('SELECT * FROM products',
-   function(err, res) {
-     if(err) throw err;
-     for (var i = 0; i < res.length; i++) {
-        console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + "|" + res[i].stockQuantity);
-    }
-   });
 
+function showTable(){
+  connection.query('SELECT * FROM products',
+     function(err, res) {
+       if(err) throw err;
+       console.log("\n");
+       for (var i = 0; i < res.length; i++) {
+          console.log("ID: "+res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
+      }
+    });
+ }
+showTable();
 inquirer.prompt([
   {
     type: "input",
@@ -47,7 +51,9 @@ inquirer.prompt([
           }, {
                 id: id
             }], function(err, res) {});
-            console.log("You owe: " + (res[0].price*quantity) + " for " + quantity + " " + res[0].productName );
+          console.log("You owe: $" + (res[0].price*quantity) + " for " + quantity + " " + res[0].productName );
+          (console.log('Products Updated'));
+          showTable();
         }
 
     });
