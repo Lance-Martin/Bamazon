@@ -1,5 +1,4 @@
 var mysql = require('mysql');
-//var prompt = require('prompt');
 var inquirer = require('inquirer');
 var connection = mysql.createConnection({
   host: 'localhost',
@@ -9,17 +8,20 @@ var connection = mysql.createConnection({
   database: 'Bamazon'
 });
 
+//function to be called when the user wants to view the full inventory
 function viewProducts() {
   connection.query('SELECT * FROM products',
      function(err, res) {
        if(err) throw err;
        console.log('\n');
+       console.log('ID | Product Name | Department | Price | quantity in stock');
        for (var i = 0; i < res.length; i++) {
           console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
       }
+      startPrompt();
      });
 }
-
+//function to be called to view the low inventory
 function viewLow() {
   connection.query('SELECT * FROM products WHERE stockQuantity < 6',
      function(err, res) {
@@ -28,9 +30,10 @@ function viewLow() {
        for (var i = 0; i < res.length; i++) {
           console.log(res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
       }
+      startPrompt();
      });
 }
-
+//function to replinish stock of a selected item
 function addMore() {
   inquirer.prompt([
     {
@@ -46,38 +49,26 @@ function addMore() {
   ]).then(function(user){
     var id = user.idSelected;
     var currentQuantity;
-    var theNum;
-    console.log('id to be added to: '+ id);
-    console.log("number to add:"+user.numAdded);
+    var quantAdded;
     connection.query('SELECT stockQuantity FROM products WHERE id = ' + user.idSelected, function(err, res) {
     if (err) throw err;
     currentQuantity = res[0].stockQuantity;
-    console.log("current q:"+ currentQuantity);
-    //theNum = (currentQuantity + user.numAdded).replace( /^\D+/g, '');
-    theNum = parseInt(currentQuantity)+ parseInt(user.numAdded);
-    console.log('the number after being added to: ' + theNum);
+    quantAdded = parseInt(currentQuantity)+ parseInt(user.numAdded);
     connection.query("UPDATE products SET ? WHERE ?", [{
-      stockQuantity: theNum,
+      stockQuantity: quantAdded,
     },{
           id: id
       }
     ], function(err, res) {
         if(err) throw err;
         console.log("quantity added");
+        viewProducts();
       });
     });
-    // connection.query("UPDATE products SET ? WHERE ?", [{
-    //   stockQuantity: theNum,
-    // },{
-    //       id: id
-    //   }
-    // ], function(err, res) {
-    //     if(err) throw err;
-    //     console.log("quantity added");
-    //   });
-    });
-}
 
+  });
+}
+//function to add another item to the table
 function addItem() {
   inquirer.prompt([
     {
@@ -107,27 +98,30 @@ function addItem() {
     price: user.price,
     stockQuantity: user.amount,
     }, function(err, res) {
-
+      viewProducts();
     });
   });
 }
-
-inquirer.prompt([{
-  type: 'list',
-  message: 'what do you want to do?',
-  choices: ["view products for sale", "view low inventory", "add to inventory", "add new product"],
-  name: "option"
-}]).then(function(user){
-  if (user.option == "view products for sale"){
-    viewProducts();
-  }
-  else if (user.option == "view low inventory"){
-    viewLow();
-  }
-  else if (user.option == "add to inventory"){
-    addMore();
-  }
-  else if (user.option == "add new product"){
-    addItem();
-  }
-});
+//Starting function to ask the user which option they want to go with
+function startPrompt(){
+  inquirer.prompt([{
+    type: 'list',
+    message: 'what do you want to do?',
+    choices: ["view products for sale", "view low inventory", "add to inventory", "add new product"],
+    name: "option"
+  }]).then(function(user){
+    if (user.option == "view products for sale"){
+      viewProducts();
+    }
+    else if (user.option == "view low inventory"){
+      viewLow();
+    }
+    else if (user.option == "add to inventory"){
+      addMore();
+    }
+    else if (user.option == "add new product"){
+      addItem();
+    }
+  });
+}
+startPrompt();

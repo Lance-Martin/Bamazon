@@ -1,5 +1,4 @@
 var mysql = require('mysql');
-var prompt = require('prompt');
 var inquirer = require('inquirer');
 var connection = mysql.createConnection({
   host: 'localhost',
@@ -18,6 +17,7 @@ function showTable(){
      function(err, res) {
        if(err) throw err;
        console.log("\n");
+       console.log('ID    | Product Name | Department | Price | quantity in stock');
        for (var i = 0; i < res.length; i++) {
           console.log("ID: "+res[i].id + " | " + res[i].productName + " | " + res[i].departmentName + " | " + res[i].price + " | " + res[i].stockQuantity);
       }
@@ -42,7 +42,6 @@ inquirer.prompt([
     connection.query('SELECT stockQuantity, productName, price FROM products WHERE id = '+id,
       function(err, res) {
         if(err) throw err;
-        console.log(res);
         if (res[0].stockQuantity < quantity) {
           console.log('Sorry you selected more than we have in stock');
         } else {
