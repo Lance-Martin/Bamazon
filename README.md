@@ -20,4 +20,4 @@ Node.js and mySQL based storefront
 ##### The manager is then shown the inventory of products with the updated quantity.
 ![alt text](managerRestockFinal.png "show the manager the updated inventory table")
 ##### If the manager selects to add an item they are asked to enter the name of the item, the department of the item, the price of the item, and how many of the  item is being added.
-![alt text](managerAddItem.png "adding an item")
+![alt text](ManagerAddItem.png "adding an item")
